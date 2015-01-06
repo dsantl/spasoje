@@ -6,7 +6,7 @@ def get_mask(img_color):
     (_, _, img) = cv2.split(img_color)
     #img = cv2.cvtColor(img_color, cv2.COLOR_BGR2GRAY)
     img = cv2.blur(img, (1, 5))
-    ret, img = cv2.threshold(img, 120, 255, cv2.THRESH_BINARY)
+    ret, img = cv2.threshold(img, 120, 1, cv2.THRESH_BINARY)
     kernel = np.ones((3, 3), np.uint8)
     img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 

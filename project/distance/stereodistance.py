@@ -1,3 +1,5 @@
+import numpy as np
+import cv2
 
 def avg(lst):
     suma = sum(lst)
@@ -8,29 +10,23 @@ def get_distance_height_pair(img_l, img_r):
 
     height = img_l.shape[0]
     width = img_l.shape[1]
-
-    d_list_l = [[] for i in xrange(height)]
-    d_list_r = [[] for i in xrange(height)]
-
-    
-    for i in xrange(height):
-        for j in xrange(width):
-            if img_l[i, j] == 255:
-                d_list_l[i].append(j)
-            if img_r[i, j] == 255:
-                d_list_r[i].append(j)
-
-    yl = []
-    zl = []
-    
     B = 100.0
-    for i in xrange(height):
-        if d_list_l[i] and d_list_r[i]:
-            x_l = avg(d_list_l[i])
-            x_r = avg(d_list_r[i])
-            dx = x_l - x_r
-            z = -B/dx
-            yl.append(height-i-1)
-            zl.append(z)
+
+    ind = np.indices((height, width))[1]
+    ones = np.ones((width, 1))
+
+    ind_l = np.multiply(img_l, ind)
+    ind_r = np.multiply(img_r, ind)
+
+
+    x_l = np.dot(ind_l, ones) / float(width)
+    x_r = np.dot(ind_r, ones) / float(width)
+
+    yl = np.arange(0, height, 1)
+    yl = yl[::-1]
+
+    dx = x_l - x_r
     
+    zl = -B / dx
+
     return (zl, yl)
