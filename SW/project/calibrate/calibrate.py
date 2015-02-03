@@ -9,12 +9,12 @@ param2 = 30
 
 def translate_y_img(img_l, y_l, y_r):
 
-    rows,cols = img_l.shape
-    
-    delta_y = np.average(y_r - y_l)
+    delta_y = y_r - y_l
+    delta_y = np.mean(delta_y)
+
     M = np.float32([[1,0,0],[0,1,delta_y]])
    
-    return cv2.warpAffine(img_l, M, (cols,rows))
+    return M
     
 
 def fit_scale_rotation(img_l, img_r, d1, r1, d2, r2):
@@ -25,11 +25,9 @@ def fit_scale_rotation(img_l, img_r, d1, r1, d2, r2):
 
     M1 = cv2.getRotationMatrix2D((cols/2,rows/2), d1, 1)
     M2 = cv2.getRotationMatrix2D((cols/2,rows/2), d2, resize)
-    
-    img_l = cv2.warpAffine(img_l, M1, (cols,rows))
-    img_r = cv2.warpAffine(img_r, M2, (cols,rows)) 
+   
 
-    return (img_l, img_r)
+    return (M1, M2)
 
 
 def get_degree_radius(img):
@@ -54,6 +52,7 @@ def get_degree_radius(img):
         radius.append(i[2])
 
     x = np.array(x)
+    x = x.astype(int)
     A = np.array([x, np.ones(circle_number)])
     w = np.linalg.lstsq(A.T,y)[0]
     avg_radius = np.average(radius)
@@ -61,7 +60,7 @@ def get_degree_radius(img):
     degree = np.degrees(np.arctan(w[0]))
     
     
-    return (-degree, avg_radius, x)
+    return (-degree, avg_radius, np.sort(x))
 
 def main():
     #right = cv2.VideoCapture(1) 
@@ -85,10 +84,19 @@ def main():
     if (p1 is not None) and (p2 is not None):
         (d1, r1, y1) = p1
         (d2, r2, y2) = p2
-        print d1, r1
-        print d2, r2
-        img_l, img_r = fit_scale_rotation(img_l, img_r, d1, r1, d2, r2) 
-        #cal_l = translate_y_img(cal_l, y1, y2)
+        M_l, M_r = fit_scale_rotation(img_l, img_r, d1, r1, d2, r2) 
+        
+
+        img_l = cv2.warpAffine(img_l, M_l, img_resize)
+        img_r = cv2.warpAffine(img_r, M_r, img_resize) 
+        
+        p1 = get_degree_radius(img_l)
+        p2 = get_degree_radius(img_r)
+        (d1, r1, y1) = p1
+        (d2, r2, y2) = p2
+        M_l_r = translate_y_img(img_l, y1, y2)
+        img_l = cv2.warpAffine(img_l, M_l_r, img_resize)
+
 
     cv2.imshow("l", img_l)
     cv2.imshow("r", img_r)
