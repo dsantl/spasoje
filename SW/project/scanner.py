@@ -1,6 +1,7 @@
 import capture.stereocapture as cap
 import laser.findlaser as laser
 import distance.stereodistance as distance
+import calibrate.calibrate as calibrate
 import cv2
 import matplotlib.pyplot as plt
 import sys
@@ -23,7 +24,7 @@ def image_process(img_l, img_r):
     #cv2.imshow("left", img_binary_l)
 
     plt.clf()
-    #plt.axis([0, 1, 0, 500])
+    plt.axis([-1, 0, 0, 500])
     plt.plot(z_list, y_list)
     plt.draw()
     

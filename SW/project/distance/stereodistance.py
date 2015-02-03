@@ -1,11 +1,6 @@
 import numpy as np
 import cv2
 
-def avg(lst):
-    suma = sum(lst)
-    return suma / float(len(lst))
-
-
 def get_distance_height_pair(img_l, img_r):
 
     height = img_l.shape[0]
@@ -19,8 +14,14 @@ def get_distance_height_pair(img_l, img_r):
     ind_r = np.multiply(img_r, ind)
 
 
-    x_l = np.dot(ind_l, ones) / float(width)
-    x_r = np.dot(ind_r, ones) / float(width)
+    x_l = np.dot(ind_l, ones)
+    x_r = np.dot(ind_r, ones)
+
+    num_l = np.dot(img_l, ones)
+    num_r = np.dot(img_r, ones)
+
+    x_l = x_l / num_l
+    x_r = x_r / num_r
 
     yl = np.arange(0, height, 1)
     yl = yl[::-1]
